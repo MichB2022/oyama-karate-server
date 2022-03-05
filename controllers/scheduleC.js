@@ -1,12 +1,31 @@
-const ErrorResponse = require('../utils/errorResponse');
+const { ErrorResponse, returnErr } = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const uuid = require('uuid');
 const db = require('../utils/db');
 
 // Schedule
 
+// @desc      Get schedule by id
+// @route     GET /api/v1/schedule/:id
+// @access    Public
+exports.getScheduleById = asyncHandler(async (req, res, next) => {
+  let sql = `SELECT * FROM Schedule WHERE id='${req.params.id}'`;
+
+  db.query(sql, (err, result) => {
+    if (err) {
+      return next(new ErrorResponse(err, 500));
+    }
+
+    res.status(201).json({
+      success: true,
+      count: result.length,
+      data: result[0]
+    });
+  });
+});
+
 // @desc      Get all schedules
-// @route     GET /api/v1/schedule/row
+// @route     GET /api/v1/schedule
 // @access    Public
 exports.getAllSchedules = asyncHandler(async (req, res, next) => {
   let sql = 'SELECT * FROM Schedule';
@@ -137,6 +156,17 @@ exports.deleteSchedule = asyncHandler(async (req, res, next) => {
     });
   });
 
+  sql = `DELETE FROM ScheduleRow WHERE scheduleId='${req.params.id}'`;
+  await new Promise((resolve, reject) => {
+    db.query(sql, (err, result) => {
+      if (err) {
+        return next(new ErrorResponse(err, 500));
+      }
+
+      resolve();
+    });
+  });
+
   sql = `DELETE FROM Schedule WHERE id='${req.params.id}'`;
   db.query(sql, (err, result) => {
     if (err) {
@@ -153,7 +183,7 @@ exports.deleteSchedule = asyncHandler(async (req, res, next) => {
 // Schedule Row
 
 // @desc      Get all schedule rows
-// @route     GET /api/v1/schedule/row
+// @route     GET /api/v1/schedule/row/all
 // @access    Public
 exports.getAllScheduleRows = asyncHandler(async (req, res, next) => {
   const sql = 'SELECT * FROM ScheduleRow';
@@ -167,6 +197,25 @@ exports.getAllScheduleRows = asyncHandler(async (req, res, next) => {
       success: true,
       count: result.length,
       data: result
+    });
+  });
+});
+
+// @desc      Get schedule row by id
+// @route     GET /api/v1/schedule/row/single/:id
+// @access    Public
+exports.getScheduleRowById = asyncHandler(async (req, res, next) => {
+  const sql = `SELECT * FROM ScheduleRow WHERE id='${req.params.id}'`;
+
+  db.query(sql, (err, result) => {
+    if (err) {
+      return next(new ErrorResponse(err, 500));
+    }
+
+    res.status(201).json({
+      success: true,
+      count: result.length,
+      data: result[0]
     });
   });
 });

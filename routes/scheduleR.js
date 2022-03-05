@@ -2,11 +2,13 @@ const express = require('express');
 const {
   getAllSchedules,
   getAllSchedulesNames,
+  getScheduleById,
   createSchedule,
   updateSchedule,
   deleteSchedule,
   getAllScheduleRows,
   getAllScheduleRowsForSection,
+  getScheduleRowById,
   createScheduleRow,
   updateScheduleRow,
   deleteScheduleRow
@@ -20,14 +22,19 @@ const advancedResults = require('../middleware/advancedResults');
 router.route('/').get(getAllSchedules).post(createSchedule);
 router.route('/names').get(getAllSchedulesNames);
 router.route('/add').post(createSchedule);
-router.route('/:id').post(updateSchedule).delete(deleteSchedule);
+router
+  .route('/:id')
+  .get(getScheduleById)
+  .post(updateSchedule)
+  .delete(deleteSchedule);
 
-router.route('/row').get(getAllScheduleRows);
+router.route('/row/all').get(getAllScheduleRows);
 router.route('/row/add').post(createScheduleRow);
 router
   .route('/row/:id')
   .get(getAllScheduleRowsForSection)
   .post(updateScheduleRow)
   .delete(deleteScheduleRow);
+router.route('/row/single/:id').get(getScheduleRowById);
 
 module.exports = router;

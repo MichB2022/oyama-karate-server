@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs');
-const ErrorResponse = require('../utils/errorResponse');
+const { ErrorResponse, returnErr } = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const checkIfFileIsImage = require('../utils/imageFiles');
 const uuid = require('uuid');
@@ -168,9 +168,11 @@ exports.deleteSection = asyncHandler(async (req, res, next) => {
   const section = await new Promise((resolve, reject) => {
     db.query(sql, (err, result) => {
       if (err) {
-        return next(new ErrorResponse(err, 500));
+        returnErr(res, 500, err);
+        reject();
       } else if (!result.length) {
-        return next(new ErrorResponse('Section not found', 404));
+        returnErr(res, 404, 'Section not found');
+        reject();
       }
 
       resolve(result);
@@ -181,28 +183,31 @@ exports.deleteSection = asyncHandler(async (req, res, next) => {
   await new Promise((resolve, reject) => {
     db.query(sql, (err, result) => {
       if (err) {
-        return next(new ErrorResponse(err, 500));
+        returnErr(res, 500, err);
+        reject();
+      }
+
+      resolve(result);
+    });
+  });
+
+  sql = `DELETE FROM SectionsGroup WHERE sectionId='${req.params.id}'`;
+  await new Promise((resolve, reject) => {
+    db.query(sql, (err, result) => {
+      if (err) {
+        returnErr(res, 500, err);
+        reject();
       }
 
       resolve();
     });
   });
 
-  sql = `DELETE FROM SectionsGroup WHERE sectionId='${req.params.id}'`;
-  db.query(sql, (err, result) => {
-    if (err) {
-      return next(new ErrorResponse(err, 500));
-    }
-
-    res.status(201).json({
-      success: true,
-      data: {}
-    });
-  });
-
   if (
     fs.existsSync(
-      `${process.env.FILE_UPLOAD_PATH}/photos/sections/${section[0].bigImgUrl}`
+      `${process.env.FILE_UPLOAD_PATH}/photos/sections/${
+        section[0].bigImgUrl || 'photo'
+      }`
     )
   ) {
     fs.unlinkSync(
@@ -211,7 +216,9 @@ exports.deleteSection = asyncHandler(async (req, res, next) => {
   }
   if (
     fs.existsSync(
-      `${process.env.FILE_UPLOAD_PATH}/photos/sections/${section[0].smallImgUrl}`
+      `${process.env.FILE_UPLOAD_PATH}/photos/sections/${
+        section[0].smallImgUrl || 'photo'
+      }`
     )
   ) {
     fs.unlinkSync(
@@ -222,7 +229,8 @@ exports.deleteSection = asyncHandler(async (req, res, next) => {
   sql = `DELETE FROM Sections WHERE id='${req.params.id}'`;
   db.query(sql, (err, result) => {
     if (err) {
-      return next(new ErrorResponse(err, 500));
+      returnErr(res, 500, err);
+      return;
     }
 
     res.status(201).json({

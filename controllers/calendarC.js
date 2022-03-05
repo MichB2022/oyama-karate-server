@@ -1,4 +1,4 @@
-const ErrorResponse = require('../utils/errorResponse');
+const { ErrorResponse, returnErr } = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const {
   checkIfFileIsImage,
@@ -11,7 +11,7 @@ const db = require('../utils/db');
 // @desc      Get all calendar
 // @route     GET /api/v1/calendar
 // @access    Public
-exports.getCalendar = asyncHandler(async (req, res, next) => {
+exports.getCalendars = asyncHandler(async (req, res, next) => {
   const sql = 'SELECT * FROM Calendar';
 
   db.query(sql, (err, result) => {
@@ -23,6 +23,24 @@ exports.getCalendar = asyncHandler(async (req, res, next) => {
       success: true,
       count: result.length,
       data: result
+    });
+  });
+});
+
+// @desc      Get all calendar
+// @route     GET /api/v1/calendar/:id
+// @access    Public
+exports.getCalendarById = asyncHandler(async (req, res, next) => {
+  const sql = `SELECT * FROM Calendar WHERE id='${req.params.id}'`;
+
+  db.query(sql, (err, result) => {
+    if (err) {
+      return next(new ErrorResponse(err, 500));
+    }
+
+    res.status(201).json({
+      success: true,
+      data: result[0]
     });
   });
 });

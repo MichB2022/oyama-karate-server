@@ -62,6 +62,7 @@ app.use('/api/v1/sectionsgroup', sectionsGroupR);
 app.use('/api/v1/schedule', scheduleR);
 app.use('/api/v1/preschooler', preschoolersR);
 app.use('/api/v1/eventcategories', eventCategoryR);
+app.use('/api/v1/infopages', infoPageR);
 app.use('/api/v1/calendar', calendarR);
 app.use('/api/v1/instructors', instructorR);
 

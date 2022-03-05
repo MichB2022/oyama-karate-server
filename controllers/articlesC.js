@@ -1,7 +1,7 @@
 const path = require('path');
 const slugify = require('slugify');
 const fs = require('fs');
-const ErrorResponse = require('../utils/errorResponse');
+const { ErrorResponse, returnErr } = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
 const checkIfFileIsImage = require('../utils/imageFiles');
 const uuid = require('uuid');

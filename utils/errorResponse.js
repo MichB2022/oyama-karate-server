@@ -5,4 +5,12 @@ class ErrorResponse extends Error {
   }
 }
 
-module.exports = ErrorResponse;
+const returnErr = (res, code, err) => {
+  res.status(code).json({
+    success: false,
+    error: err
+  });
+  return;
+};
+
+module.exports = { ErrorResponse, returnErr };
