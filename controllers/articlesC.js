@@ -3,7 +3,7 @@ const slugify = require('slugify');
 const fs = require('fs');
 const { ErrorResponse, returnErr } = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
-const checkIfFileIsImage = require('../utils/imageFiles');
+const { checkIfFileIsImage, deleteFiles } = require('../utils/imageFiles');
 const uuid = require('uuid');
 const db = require('../utils/db');
 
@@ -11,8 +11,17 @@ const db = require('../utils/db');
 // @route     GET /api/v1/articles
 // @access    Public
 exports.getArticles = asyncHandler(async (req, res, next) => {
-  let sql = 'SELECT * FROM Article';
+  let where = '';
+  if (req.query.title && req.query.filterByCategory) {
+    where = `WHERE title LIKE '%${req.query.title}%' AND category_id='${req.query.filterByCategory}'`;
+  } else if (req.query.title) {
+    where = `WHERE title LIKE '%${req.query.title}%'`;
+  } else if (req.query.filterByCategory) {
+    where = `WHERE category_id='${req.query.filterByCategory}'`;
+    console.log(where);
+  }
 
+  let sql = `SELECT * FROM Article ${where}`;
   const articles = await new Promise((resolve, reject) => {
     db.query(sql, (err, result) => {
       if (err) {
@@ -29,11 +38,13 @@ exports.getArticles = asyncHandler(async (req, res, next) => {
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
 
-    sql = `SELECT * FROM Article LIMIT ${limit} OFFSET ${startIndex}`;
+    sql = `SELECT * FROM Article ${where} ORDER BY createdAt DESC LIMIT ${limit} OFFSET ${startIndex}`;
     db.query(sql, (err, result) => {
       if (err) {
         return next(new ErrorResponse(err, 500));
       }
+
+      result.map((el) => (el.tags = el.tags.split(',')));
 
       res.status(201).json({
         success: true,
@@ -43,7 +54,7 @@ exports.getArticles = asyncHandler(async (req, res, next) => {
           perPage: limit,
           pagesCount: Math.ceil(articles.length / limit)
         },
-        data: result
+        data: result || []
       });
     });
   } else {
@@ -68,9 +79,11 @@ exports.getArticle = asyncHandler(async (req, res, next) => {
       return next(new ErrorResponse('Article not found', 404));
     }
 
+    result[0].tags = result[0].tags.split(',');
+
     res.status(201).json({
       success: true,
-      data: result
+      data: result[0] || {}
     });
   });
 });
@@ -83,7 +96,8 @@ exports.createArticle = asyncHandler(async (req, res, next) => {
 
   req.body.id = uuid.v1().split('-').join('');
   req.body.slug = slugify(req.body.title, { lower: true });
-  req.body.createdAt = new Date();
+  req.body.createdAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
+  req.body.tags = req.body?.tags.map((tag) => tag.name).join(',');
 
   db.queryWithParams(sql, req.body, (err, result) => {
     if (err) {
@@ -119,6 +133,7 @@ exports.updateArticle = asyncHandler(async (req, res, next) => {
   if (req.body.title) {
     req.body.slug = slugify(req.body.title, { lower: true });
   }
+  req.body.tags = req.body?.tags.map((tag) => tag.name).join(',');
 
   db.queryWithParams(sql, req.body, (err, result) => {
     if (err) {
@@ -147,24 +162,11 @@ exports.deleteArticle = asyncHandler(async (req, res, next) => {
 
     sql = `DELETE FROM Article WHERE id='${req.params.id}'`;
 
-    if (
-      fs.existsSync(
-        `${process.env.FILE_UPLOAD_PATH}/photos/sections/${result[0].bigImgUrl}`
-      )
-    ) {
-      fs.unlinkSync(
-        `${process.env.FILE_UPLOAD_PATH}/photos/sections/${result[0].bigImgUrl}`
-      );
-    }
-    if (
-      fs.existsSync(
-        `${process.env.FILE_UPLOAD_PATH}/photos/sections/${result[0].smallImgUrl}`
-      )
-    ) {
-      fs.unlinkSync(
-        `${process.env.FILE_UPLOAD_PATH}/photos/sections/${result[0].smallImgUrl}`
-      );
-    }
+    const filePath = `${process.env.FILE_UPLOAD_PATH}/photos/articles/`;
+    deleteFiles([
+      `${filePath}${result[0].bigImgUrl || 'photo'}`,
+      `${filePath}${result[0].smallImgUrl || 'photo'}`
+    ]);
 
     const resolveDelete = (err, result) => {
       if (err) {
