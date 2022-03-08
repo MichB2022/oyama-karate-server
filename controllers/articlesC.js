@@ -3,7 +3,11 @@ const slugify = require('slugify');
 const fs = require('fs');
 const { ErrorResponse, returnErr } = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
-const { checkIfFileIsImage, deleteFiles } = require('../utils/imageFiles');
+const {
+  checkIfFileIsImage,
+  deleteFiles,
+  uploadFiles
+} = require('../utils/imageFiles');
 const uuid = require('uuid');
 const db = require('../utils/db');
 
@@ -97,7 +101,40 @@ exports.createArticle = asyncHandler(async (req, res, next) => {
   req.body.id = uuid.v1().split('-').join('');
   req.body.slug = slugify(req.body.title, { lower: true });
   req.body.createdAt = new Date().toISOString().slice(0, 19).replace('T', ' ');
-  req.body.tags = req.body?.tags.map((tag) => tag.name).join(',');
+  // req.body.tags = req.body?.tags.map((tag) => tag.name).join(',');
+
+  if (req.files) {
+    const bigImg = req.files.bigImg;
+    const smallImg = req.files.smallImg;
+
+    let files = [bigImg, smallImg];
+    files = files.filter((file) => file !== undefined);
+
+    checkIfFileIsImage(files);
+    uploadFiles(
+      `${process.env.FILE_UPLOAD_PATH}/photos/articles/`,
+      req.params.id,
+      files
+    );
+
+    if (smallImg && bigImg) {
+      req.body = {
+        ...req.body,
+        bigImgUrl: bigImg.name,
+        smallImgUrl: smallImg.name
+      };
+    } else if (smallImg) {
+      req.body = {
+        ...req.body,
+        smallImgUrl: smallImg.name
+      };
+    } else if (bigImg) {
+      req.body = {
+        ...req.body,
+        bigImgUrl: bigImg.name
+      };
+    }
+  }
 
   db.queryWithParams(sql, req.body, (err, result) => {
     if (err) {
@@ -133,7 +170,41 @@ exports.updateArticle = asyncHandler(async (req, res, next) => {
   if (req.body.title) {
     req.body.slug = slugify(req.body.title, { lower: true });
   }
-  req.body.tags = req.body?.tags.map((tag) => tag.name).join(',');
+  // req.body.tags = req.body?.tags.map((tag) => tag.name).join(',');
+
+  if (req.files) {
+    const bigImg = req.files.bigImg;
+    const smallImg = req.files.smallImg;
+
+    let files = [bigImg, smallImg];
+    files = files.filter((file) => file !== undefined);
+
+    const filePath = `${process.env.FILE_UPLOAD_PATH}/photos/articles/`;
+    deleteFiles([
+      bigImg ? `${filePath}${article[0].bigImgUrl || 'photo'}` : 'photo',
+      smallImg ? `${filePath}${article[0].smallImgUrl || 'photo'}` : 'photo'
+    ]);
+    checkIfFileIsImage(files);
+    uploadFiles(filePath, req.params.id, files);
+
+    if (smallImg && bigImg) {
+      req.body = {
+        ...req.body,
+        bigImgUrl: bigImg.name,
+        smallImgUrl: smallImg.name
+      };
+    } else if (smallImg) {
+      req.body = {
+        ...req.body,
+        smallImgUrl: smallImg.name
+      };
+    } else if (bigImg) {
+      req.body = {
+        ...req.body,
+        bigImgUrl: bigImg.name
+      };
+    }
+  }
 
   db.queryWithParams(sql, req.body, (err, result) => {
     if (err) {

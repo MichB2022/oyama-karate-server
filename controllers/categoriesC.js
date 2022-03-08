@@ -7,7 +7,7 @@ const db = require('../utils/db');
 // @route     GET /api/v1/categories
 // @access    Public
 exports.getCategories = asyncHandler(async (req, res, next) => {
-  const sql = 'SELECT * FROM Category';
+  const sql = 'SELECT * FROM Category ORDER BY itemOrder';
 
   const resolve = (err, result) => {
     if (err) {
