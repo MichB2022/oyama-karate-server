@@ -113,7 +113,7 @@ exports.createArticle = asyncHandler(async (req, res, next) => {
     checkIfFileIsImage(files);
     uploadFiles(
       `${process.env.FILE_UPLOAD_PATH}/photos/articles/`,
-      req.params.id,
+      req.body.id,
       files
     );
 
