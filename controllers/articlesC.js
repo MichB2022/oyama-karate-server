@@ -42,7 +42,7 @@ exports.getArticles = asyncHandler(async (req, res, next) => {
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
 
-    sql = `SELECT * FROM Article ${where} ORDER BY createdAt DESC LIMIT ${limit} OFFSET ${startIndex}`;
+    sql = `SELECT a.*, c.name as categoryName FROM Article a INNER JOIN Category c ON a.category_id=c.id ${where} ORDER BY a.createdAt DESC LIMIT ${limit} OFFSET ${startIndex}`;
     db.query(sql, (err, result) => {
       if (err) {
         return next(new ErrorResponse(err, 500));
@@ -74,7 +74,7 @@ exports.getArticles = asyncHandler(async (req, res, next) => {
 // @route     GET /api/v1/articles/:id
 // @access    Public
 exports.getArticle = asyncHandler(async (req, res, next) => {
-  const sql = `SELECT * FROM Article WHERE id='${req.params.id}'`;
+  const sql = `SELECT a.*, c.name as categoryName FROM Article a INNER JOIN Category c ON a.category_id=c.id WHERE a.id='${req.params.id}'`;
 
   db.query(sql, (err, result) => {
     if (err) {
