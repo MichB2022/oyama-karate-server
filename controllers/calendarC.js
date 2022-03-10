@@ -13,7 +13,7 @@ const db = require('../utils/db');
 // @access    Public
 exports.getCalendars = asyncHandler(async (req, res, next) => {
   const sql =
-    'SELECT c.*, ca.name as categoryName FROM Calendar c INNER JOIN EventCategory ca ON c.eventCategoryId=ca.id';
+    'SELECT c.*, ca.name as categoryName FROM Calendar c INNER JOIN EventCategory ca ON c.eventCategoryId=ca.id ORDER BY c.startDate';
 
   db.query(sql, (err, result) => {
     if (err) {
