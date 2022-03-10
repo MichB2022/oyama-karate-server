@@ -12,20 +12,64 @@ const db = require('../utils/db');
 // @route     GET /api/v1/calendar
 // @access    Public
 exports.getCalendars = asyncHandler(async (req, res, next) => {
-  const sql =
-    'SELECT c.*, ca.name as categoryName FROM Calendar c INNER JOIN EventCategory ca ON c.eventCategoryId=ca.id ORDER BY c.startDate';
+  let where = '';
+  if (req.query.title && req.query.filterByCategory) {
+    where = `WHERE c.title LIKE '%${req.query.title}%' AND c.eventCategoryId='${req.query.filterByCategory}'`;
+  } else if (req.query.title) {
+    where = `WHERE c.title LIKE '%${req.query.title}%'`;
+  } else if (req.query.filterByCategory) {
+    where = `WHERE c.eventCategoryId='${req.query.filterByCategory}'`;
+  }
+  let sql = 'SELECT * FROM Calendar';
+  const calendarEvents = await new Promise((resolve, reject) => {
+    db.query(sql, (err, result) => {
+      if (err) {
+        return next(new ErrorResponse(err, 500));
+      }
 
-  db.query(sql, (err, result) => {
-    if (err) {
-      return next(new ErrorResponse(err, 500));
-    }
-
-    res.status(201).json({
-      success: true,
-      count: result.length,
-      data: result
+      resolve(result);
     });
   });
+
+  if (req.query.page && req.query.perpage) {
+    const page = parseInt(req.query.page, 10) || 1;
+    const limit = parseInt(req.query.perpage, 10) || 4;
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+
+    sql = `SELECT c.*, ca.name as categoryName FROM Calendar c INNER JOIN EventCategory ca ON c.eventCategoryId=ca.id ${where} ORDER BY c.startDate LIMIT ${limit} OFFSET ${startIndex}`;
+
+    db.query(sql, (err, result) => {
+      if (err) {
+        return next(new ErrorResponse(err, 500));
+      }
+
+      res.status(201).json({
+        success: true,
+        count: result.length,
+        pagination: {
+          currentPage: page,
+          perPage: limit,
+          pagesCount: Math.ceil(calendarEvents.length / limit)
+        },
+        data: result || []
+      });
+    });
+  } else {
+    sql = `SELECT c.*, ca.name as categoryName FROM Calendar c INNER JOIN EventCategory ca ON c.eventCategoryId=ca.id ${where} ORDER BY c.startDate`;
+
+    db.query(sql, (err, result) => {
+      if (err) {
+        return next(new ErrorResponse(err, 500));
+      }
+
+      res.status(201).json({
+        success: true,
+        count: result.length,
+        data: result
+      });
+    });
+  }
 });
 
 // @desc      Get all calendar

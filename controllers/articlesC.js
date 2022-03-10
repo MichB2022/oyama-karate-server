@@ -22,7 +22,6 @@ exports.getArticles = asyncHandler(async (req, res, next) => {
     where = `WHERE title LIKE '%${req.query.title}%'`;
   } else if (req.query.filterByCategory) {
     where = `WHERE category_id='${req.query.filterByCategory}'`;
-    console.log(where);
   }
 
   let sql = `SELECT * FROM Article ${where}`;
