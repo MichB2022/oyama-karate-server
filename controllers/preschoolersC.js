@@ -22,7 +22,7 @@ exports.getPreschooler = asyncHandler(async (req, res, next) => {
     res.status(201).json({
       success: true,
       count: result.length,
-      data: result
+      data: result[0]
     });
   });
 });
@@ -79,7 +79,7 @@ exports.createPreschooler = asyncHandler(async (req, res, next) => {
 exports.updatePreschooler = asyncHandler(async (req, res, next) => {
   let sql = `SELECT * FROM Preschooler WHERE id='${req.params.id}'`;
 
-  await new Promise((resolve, reject) => {
+  const preschooler = await new Promise((resolve, reject) => {
     db.query(sql, (err, result) => {
       if (err) {
         return next(new ErrorResponse(err, 500));
@@ -87,11 +87,18 @@ exports.updatePreschooler = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse('Preschooler not found', 404));
       }
 
-      resolve();
+      resolve(result[0]);
     });
   });
 
   if (req.files) {
+    const filePath = `${process.env.FILE_UPLOAD_PATH}/photos/preschooler/`;
+    deleteFiles([
+      `${filePath}${preschooler.firstImgUrl || 'photo'}`,
+      `${filePath}${preschooler.secondImgUrl || 'photo'}`,
+      `${filePath}${preschooler.thirdImgUrl || 'photo'}`
+    ]);
+
     const firstImg = req.files.firstImg;
     const secondImg = req.files.secondImg;
     const thirdImg = req.files.thirdImg;

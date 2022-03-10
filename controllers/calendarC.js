@@ -12,7 +12,8 @@ const db = require('../utils/db');
 // @route     GET /api/v1/calendar
 // @access    Public
 exports.getCalendars = asyncHandler(async (req, res, next) => {
-  const sql = 'SELECT * FROM Calendar';
+  const sql =
+    'SELECT c.*, ca.name as categoryName FROM Calendar c INNER JOIN EventCategory ca ON c.eventCategoryId=ca.id';
 
   db.query(sql, (err, result) => {
     if (err) {
@@ -31,7 +32,7 @@ exports.getCalendars = asyncHandler(async (req, res, next) => {
 // @route     GET /api/v1/calendar/:id
 // @access    Public
 exports.getCalendarById = asyncHandler(async (req, res, next) => {
-  const sql = `SELECT * FROM Calendar WHERE id='${req.params.id}'`;
+  const sql = `SELECT c.*, ca.name as categoryName FROM Calendar c INNER JOIN EventCategory ca ON c.eventCategoryId=ca.id WHERE c.id='${req.params.id}'`;
 
   db.query(sql, (err, result) => {
     if (err) {

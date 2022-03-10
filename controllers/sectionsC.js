@@ -2,7 +2,11 @@ const path = require('path');
 const fs = require('fs');
 const { ErrorResponse, returnErr } = require('../utils/errorResponse');
 const asyncHandler = require('../middleware/async');
-const checkIfFileIsImage = require('../utils/imageFiles');
+const {
+  checkIfFileIsImage,
+  deleteFiles,
+  uploadFiles
+} = require('../utils/imageFiles');
 const uuid = require('uuid');
 const db = require('../utils/db');
 const { group } = require('console');
@@ -122,6 +126,27 @@ exports.createSection = asyncHandler(async (req, res, next) => {
 
   req.body.id = uuid.v1().split('-').join('');
 
+  if (req.files) {
+    const bigImg = req.files.bigImg;
+
+    let files = [bigImg];
+    files = files.filter((file) => file !== undefined);
+
+    checkIfFileIsImage(files);
+    uploadFiles(
+      `${process.env.FILE_UPLOAD_PATH}/photos/sections/`,
+      req.body.id,
+      files
+    );
+
+    if (bigImg) {
+      req.body = {
+        ...req.body,
+        bigImgUrl: bigImg.name
+      };
+    }
+  }
+
   const resolve = (err, result) => {
     if (err) {
       return next(new ErrorResponse(err, 500));
@@ -140,24 +165,56 @@ exports.createSection = asyncHandler(async (req, res, next) => {
 // @route     PUT /api/v1/sections/:id
 // @access    Private
 exports.updateSection = asyncHandler(async (req, res, next) => {
-  const update = () => {
-    sql = `UPDATE Sections SET ? WHERE id='${req.params.id}'`;
-
-    const resolveUpdate = (err, result) => {
+  let sql = `SELECT * FROM Sections WHERE id='${req.params.id}'`;
+  const section = await new Promise((resolve, reject) => {
+    db.query(sql, (err, result) => {
       if (err) {
-        return next(new ErrorResponse(err, 500));
+        returnErr(res, 500, err);
+        reject();
+      } else if (!result.length) {
+        returnErr(res, 404, 'Section not found');
+        reject();
       }
 
-      res.status(201).json({
-        success: true,
-        data: req.body
-      });
-    };
+      resolve(result);
+    });
+  });
 
-    db.queryWithParams(sql, req.body, resolveUpdate);
+  if (req.files) {
+    const bigImg = req.files.bigImg;
+
+    let files = [bigImg];
+    files = files.filter((file) => file !== undefined);
+
+    const filePath = `${process.env.FILE_UPLOAD_PATH}/photos/sections/`;
+    deleteFiles([
+      bigImg ? `${filePath}${section[0].bigImgUrl || 'photo'}` : 'photo'
+    ]);
+    checkIfFileIsImage(files);
+    uploadFiles(filePath, req.params.id, files);
+
+    if (bigImg) {
+      req.body = {
+        ...req.body,
+        bigImgUrl: bigImg.name
+      };
+    }
+  }
+
+  sql = `UPDATE Sections SET ? WHERE id='${req.params.id}'`;
+
+  const resolveUpdate = (err, result) => {
+    if (err) {
+      return next(new ErrorResponse(err, 500));
+    }
+
+    res.status(201).json({
+      success: true,
+      data: req.body
+    });
   };
 
-  doSectionExistProtectedAction(next, req.params.id, update);
+  db.queryWithParams(sql, req.body, resolveUpdate);
 });
 
 // @desc      Delete section
@@ -203,28 +260,8 @@ exports.deleteSection = asyncHandler(async (req, res, next) => {
     });
   });
 
-  if (
-    fs.existsSync(
-      `${process.env.FILE_UPLOAD_PATH}/photos/sections/${
-        section[0].bigImgUrl || 'photo'
-      }`
-    )
-  ) {
-    fs.unlinkSync(
-      `${process.env.FILE_UPLOAD_PATH}/photos/sections/${section[0].bigImgUrl}`
-    );
-  }
-  if (
-    fs.existsSync(
-      `${process.env.FILE_UPLOAD_PATH}/photos/sections/${
-        section[0].smallImgUrl || 'photo'
-      }`
-    )
-  ) {
-    fs.unlinkSync(
-      `${process.env.FILE_UPLOAD_PATH}/photos/sections/${section[0].smallImgUrl}`
-    );
-  }
+  const filePath = `${process.env.FILE_UPLOAD_PATH}/photos/sections/`;
+  deleteFiles([`${filePath}${section[0].bigImgUrl || 'photo'}`]);
 
   sql = `DELETE FROM Sections WHERE id='${req.params.id}'`;
   db.query(sql, (err, result) => {
