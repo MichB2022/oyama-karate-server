@@ -53,8 +53,14 @@ exports.createCalendar = asyncHandler(async (req, res, next) => {
   const sql = 'INSERT INTO Calendar SET ?';
 
   req.body.id = uuid.v1().split('-').join('');
-  req.body.startDate = new Date(req.body.startDate);
-  req.body.endDate = new Date(req.body.endDate);
+  req.body.startDate = new Date(req.body.startDate)
+    .toISOString()
+    .slice(0, 19)
+    .replace('T', ' ');
+  req.body.endDate = new Date(req.body.endDate)
+    .toISOString()
+    .slice(0, 19)
+    .replace('T', ' ');
 
   if (req.files) {
     const img = req.files.img;
@@ -65,7 +71,7 @@ exports.createCalendar = asyncHandler(async (req, res, next) => {
     checkIfFileIsImage(files);
     uploadFiles(
       `${process.env.FILE_UPLOAD_PATH}/photos/calendar/`,
-      req.params.id,
+      req.body.id,
       files
     );
 
@@ -105,6 +111,16 @@ exports.updateCalendar = asyncHandler(async (req, res, next) => {
       resolve();
     });
   });
+
+  req.body.startDate = new Date(req.body.startDate)
+    .toISOString()
+    .slice(0, 19)
+    .replace('T', ' ');
+
+  req.body.endDate = new Date(req.body.endDate)
+    .toISOString()
+    .slice(0, 19)
+    .replace('T', ' ');
 
   if (req.files) {
     const img = req.files.img;
