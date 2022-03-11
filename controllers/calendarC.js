@@ -97,14 +97,12 @@ exports.createCalendar = asyncHandler(async (req, res, next) => {
   const sql = 'INSERT INTO Calendar SET ?';
 
   req.body.id = uuid.v1().split('-').join('');
-  req.body.startDate = new Date(req.body.startDate)
-    .toISOString()
-    .slice(0, 19)
-    .replace('T', ' ');
-  req.body.endDate = new Date(req.body.endDate)
-    .toISOString()
-    .slice(0, 19)
-    .replace('T', ' ');
+
+  const startDate = new Date(req.body.startDate);
+  req.body.startDate = startDate.toISOString().slice(0, 19).replace('T', ' ');
+
+  const endDate = new Date(req.body.endDate);
+  req.body.endDate = endDate.toISOString().slice(0, 19).replace('T', ' ');
 
   if (req.files) {
     const img = req.files.img;
@@ -156,15 +154,11 @@ exports.updateCalendar = asyncHandler(async (req, res, next) => {
     });
   });
 
-  req.body.startDate = new Date(req.body.startDate)
-    .toISOString()
-    .slice(0, 19)
-    .replace('T', ' ');
+  const startDate = new Date(req.body.startDate);
+  req.body.startDate = startDate.toISOString().slice(0, 19).replace('T', ' ');
 
-  req.body.endDate = new Date(req.body.endDate)
-    .toISOString()
-    .slice(0, 19)
-    .replace('T', ' ');
+  const endDate = new Date(req.body.endDate);
+  req.body.endDate = endDate.toISOString().slice(0, 19).replace('T', ' ');
 
   if (req.files) {
     const img = req.files.img;
