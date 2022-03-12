@@ -43,6 +43,7 @@ app.use(fileupload());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Route files
+const homepageR = require('./routes/homepageR.js');
 const articlesR = require('./routes/articlesR.js');
 const categoriesR = require('./routes/categoriesR.js');
 const sectionsR = require('./routes/sectionsR.js');
@@ -56,6 +57,7 @@ const instructorR = require('./routes/instructorR.js');
 const imagesR = require('./routes/imagesR.js');
 
 // Mount routers
+app.use('/api/v1/homepage', homepageR);
 app.use('/api/v1/articles', articlesR);
 app.use('/api/v1/categories', categoriesR);
 app.use('/api/v1/sections', sectionsR);

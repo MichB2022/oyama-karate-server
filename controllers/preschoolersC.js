@@ -46,7 +46,7 @@ exports.createPreschooler = asyncHandler(async (req, res, next) => {
     checkIfFileIsImage(files);
     uploadFiles(
       `${process.env.FILE_UPLOAD_PATH}/photos/preschooler/`,
-      req.params.id,
+      req.body.id,
       files
     );
 
