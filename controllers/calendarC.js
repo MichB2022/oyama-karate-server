@@ -142,7 +142,7 @@ exports.createCalendar = asyncHandler(async (req, res, next) => {
 exports.updateCalendar = asyncHandler(async (req, res, next) => {
   let sql = `SELECT * FROM Calendar WHERE id='${req.params.id}'`;
 
-  await new Promise((resolve, reject) => {
+  const event = await new Promise((resolve, reject) => {
     db.query(sql, (err, result) => {
       if (err) {
         return next(new ErrorResponse(err, 500));
@@ -150,7 +150,7 @@ exports.updateCalendar = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse('Calendar not found', 404));
       }
 
-      resolve();
+      resolve(result[0]);
     });
   });
 
@@ -161,6 +161,9 @@ exports.updateCalendar = asyncHandler(async (req, res, next) => {
   req.body.endDate = endDate.toISOString().slice(0, 19).replace('T', ' ');
 
   if (req.files) {
+    const filePath = `${process.env.FILE_UPLOAD_PATH}/photos/calendar/`;
+    deleteFiles([`${filePath}${event.imgUrl || 'photo'}`]);
+
     const img = req.files.img;
 
     const files = [img];

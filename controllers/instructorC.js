@@ -62,8 +62,8 @@ exports.createInstructor = asyncHandler(async (req, res, next) => {
 
     checkIfFileIsImage(files);
     uploadFiles(
-      `${process.env.FILE_UPLOAD_PATH}/photos/preschooler/`,
-      req.params.id,
+      `${process.env.FILE_UPLOAD_PATH}/photos/instructors/`,
+      req.body.id,
       files
     );
 
@@ -92,7 +92,7 @@ exports.createInstructor = asyncHandler(async (req, res, next) => {
 exports.updateInstructor = asyncHandler(async (req, res, next) => {
   let sql = `SELECT * FROM Instructor WHERE id='${req.params.id}'`;
 
-  await new Promise((resolve, reject) => {
+  const instructor = await new Promise((resolve, reject) => {
     db.query(sql, (err, result) => {
       if (err) {
         return next(new ErrorResponse(err, 500));
@@ -100,11 +100,14 @@ exports.updateInstructor = asyncHandler(async (req, res, next) => {
         return next(new ErrorResponse('Instructor not found', 404));
       }
 
-      resolve();
+      resolve(result[0]);
     });
   });
 
   if (req.files) {
+    const filePath = `${process.env.FILE_UPLOAD_PATH}/photos/instructors/`;
+    deleteFiles([`${filePath}${instructor.imgUrl || 'photo'}`]);
+
     const img = req.files.img;
 
     const files = [img];
@@ -112,7 +115,7 @@ exports.updateInstructor = asyncHandler(async (req, res, next) => {
 
     checkIfFileIsImage(files);
     uploadFiles(
-      `${process.env.FILE_UPLOAD_PATH}/photos/preschooler/`,
+      `${process.env.FILE_UPLOAD_PATH}/photos/instructors/`,
       req.params.id,
       files
     );

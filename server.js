@@ -53,6 +53,7 @@ const eventCategoryR = require('./routes/eventCategoryR.js');
 const calendarR = require('./routes/calendarR.js');
 const infoPageR = require('./routes/infoPageR.js');
 const instructorR = require('./routes/instructorR.js');
+const imagesR = require('./routes/imagesR.js');
 
 // Mount routers
 app.use('/api/v1/articles', articlesR);
@@ -65,6 +66,7 @@ app.use('/api/v1/eventcategories', eventCategoryR);
 app.use('/api/v1/infopages', infoPageR);
 app.use('/api/v1/calendar', calendarR);
 app.use('/api/v1/instructors', instructorR);
+app.use('/api/v1/images', imagesR);
 
 app.use(errorHandler);
 
