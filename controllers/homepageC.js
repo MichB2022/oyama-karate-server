@@ -100,12 +100,8 @@ exports.updateHomepage = asyncHandler(async (req, res, next) => {
 
     req.body = {
       ...req.body,
-      firstImgUrl: firstImg.name,
-      secondImgUrl: secondImg.name,
-      thirdImgUrl: thirdImg.name,
-      firstImgAlt: req.body.firstImgAlt,
-      secondImgAlt: req.body.secondImgAlt,
-      thirdImgAlt: req.body.thirdImgAlt
+      imgUrl: img.name,
+      imgAlt: req.body.imgAlt
     };
   }
 

@@ -55,6 +55,8 @@ const calendarR = require('./routes/calendarR.js');
 const infoPageR = require('./routes/infoPageR.js');
 const instructorR = require('./routes/instructorR.js');
 const imagesR = require('./routes/imagesR.js');
+const galeriesR = require('./routes/galeriesR.js');
+const motivationR = require('./routes/motivationR.js');
 
 // Mount routers
 app.use('/api/v1/homepage', homepageR);
@@ -69,6 +71,8 @@ app.use('/api/v1/infopages', infoPageR);
 app.use('/api/v1/calendar', calendarR);
 app.use('/api/v1/instructors', instructorR);
 app.use('/api/v1/images', imagesR);
+app.use('/api/v1/galery', galeriesR);
+app.use('/api/v1/motivation', motivationR);
 
 app.use(errorHandler);
 
