@@ -22,7 +22,10 @@ const app = express();
 //   })
 // );
 
-var whitelist = ['http://localhost:3000']; //white list consumers
+var whitelist = [
+  'http://localhost:3000',
+  'https://lucid-leakey-fec418.netlify.app/'
+]; //white list consumers
 var corsOptions = {
   origin: function (origin, callback) {
     if (whitelist.indexOf(origin) !== -1) {
