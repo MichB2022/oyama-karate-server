@@ -14,13 +14,38 @@ const app = express();
 
 // Security imports
 // Enable CORS
-app.use(
-  cors({
-    origin: '*',
-    credentials: true,
-    optionsSuccessStatus: 200
-  })
-);
+// app.use(
+//   cors({
+//     origin: '*',
+//     credentials: true,
+//     optionsSuccessStatus: 200
+//   })
+// );
+
+var whitelist = ['http://localhost:3000']; //white list consumers
+var corsOptions = {
+  origin: function (origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(null, false);
+    }
+  },
+  methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+  credentials: true, //Credentials are cookies, authorization headers or TLS client certificates.
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'device-remember-token',
+    'Access-Control-Allow-Origin',
+    'Origin',
+    'Accept'
+  ]
+};
+
+app.use(cors(corsOptions));
 
 // Load env vars
 dotenv.config({ path: 'config/config.env' });
@@ -29,7 +54,7 @@ dotenv.config({ path: 'config/config.env' });
 app.use(express.json());
 
 // Cookie parser
-// app.use(cookieParser());
+app.use(cookieParser());
 
 // Dev logging middleware
 if (process.env.NODE_ENV === 'development') {
@@ -43,6 +68,8 @@ app.use(fileupload());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Route files
+const auth = require('./routes/auth');
+const users = require('./routes/users');
 const homepageR = require('./routes/homepageR.js');
 const articlesR = require('./routes/articlesR.js');
 const categoriesR = require('./routes/categoriesR.js');
@@ -59,6 +86,8 @@ const galeriesR = require('./routes/galeriesR.js');
 const motivationR = require('./routes/motivationR.js');
 
 // Mount routers
+app.use('/api/v1/auth', auth);
+app.use('/api/v1/users', users);
 app.use('/api/v1/homepage', homepageR);
 app.use('/api/v1/articles', articlesR);
 app.use('/api/v1/categories', categoriesR);
