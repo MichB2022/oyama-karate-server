@@ -24,6 +24,7 @@ const app = express();
 
 var whitelist = [
   'http://localhost:3000',
+  'http://localhost:3001',
   'https://lucid-leakey-fec418.netlify.app'
 ]; //white list consumers
 var corsOptions = {

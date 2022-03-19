@@ -24,7 +24,7 @@ exports.getArticles = asyncHandler(async (req, res, next) => {
     where = `WHERE category_id='${req.query.filterByCategory}'`;
   }
 
-  let sql = `SELECT * FROM Article ${where}`;
+  let sql = `SELECT a.*, c.name as categoryName FROM Article a INNER JOIN Category c ON a.category_id=c.id ${where}`;
   const articles = await new Promise((resolve, reject) => {
     db.query(sql, (err, result) => {
       if (err) {

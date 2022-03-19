@@ -12,18 +12,38 @@ const db = require('../utils/db');
 // @route     GET /api/v1/galery
 // @access    Public
 exports.getGaleries = asyncHandler(async (req, res, next) => {
-  const sql = 'SELECT * FROM Galery';
-
-  db.query(sql, (err, result) => {
-    if (err) {
-      return next(new ErrorResponse(err, 500));
-    }
-
-    res.status(201).json({
-      success: true,
-      count: result.length,
-      data: result
+  let sql = 'SELECT * FROM Galery';
+  const galeries = await new Promise((resolve, reject) => {
+    db.query(sql, (err, result) => {
+      if (err) {
+        return next(new ErrorResponse(err, 500));
+      }
+      resolve(result);
     });
+  });
+
+  const bodyGaleries = [];
+
+  for (const galery of galeries) {
+    sql = `SELECT * FROM GaleryImages WHERE galeryId='${galery.id}' LIMIT 1`;
+
+    const image = await new Promise((resolve, reject) => {
+      db.query(sql, (err, result) => {
+        if (err) {
+          return next(new ErrorResponse(err, 500));
+        }
+
+        resolve(result);
+      });
+    });
+
+    bodyGaleries.push({ ...galery, imgUrl: image[0].url });
+  }
+
+  res.status(201).json({
+    success: true,
+    count: bodyGaleries.length,
+    data: bodyGaleries
   });
 });
 
@@ -35,6 +55,8 @@ exports.getGalery = asyncHandler(async (req, res, next) => {
 
   db.query(sql, (err, result) => {
     if (err) {
+      return next(new ErrorResponse(err, 500));
+    } else if (!result || result.length === 0) {
       return next(new ErrorResponse(err, 500));
     }
 
