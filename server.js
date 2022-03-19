@@ -25,7 +25,7 @@ const app = express();
 var whitelist = [
   'http://localhost:3000',
   'http://localhost:3001',
-  'https://oyama-karate-next-ka8lz685b-jpisula.vercel.app'
+  'https://oyama-karate-next-p75wa3o3z-jpisula.vercel.app/'
 ]; //white list consumers
 var corsOptions = {
   origin: function (origin, callback) {
