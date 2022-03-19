@@ -22,34 +22,42 @@ const app = express();
 //   })
 // );
 
-var whitelist = [
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'https://lucid-leakey-fec418.netlify.app'
-]; //white list consumers
-var corsOptions = {
-  origin: function (origin, callback) {
-    if (whitelist.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(null, false);
-    }
-  },
-  methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
-  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
-  credentials: true, //Credentials are cookies, authorization headers or TLS client certificates.
-  allowedHeaders: [
-    'Content-Type',
-    'Authorization',
-    'X-Requested-With',
-    'device-remember-token',
-    'Access-Control-Allow-Origin',
-    'Origin',
-    'Accept'
-  ]
-};
+// var whitelist = [
+//   'http://localhost:3000',
+//   'http://localhost:3001',
+//   'https://lucid-leakey-fec418.netlify.app'
+// ]; //white list consumers
+// var corsOptions = {
+//   origin: function (origin, callback) {
+//     if (whitelist.indexOf(origin) !== -1) {
+//       callback(null, true);
+//     } else {
+//       callback(null, false);
+//     }
+//   },
+//   methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
+//   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+//   credentials: true, //Credentials are cookies, authorization headers or TLS client certificates.
+//   allowedHeaders: [
+//     'Content-Type',
+//     'Authorization',
+//     'X-Requested-With',
+//     'device-remember-token',
+//     'Access-Control-Allow-Origin',
+//     'Origin',
+//     'Accept'
+//   ]
+// };
 
-app.use(cors(corsOptions));
+app.use(cors());
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', '*'); // update to match the domain you will make the request from
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept'
+  );
+  next();
+});
 
 // Load env vars
 dotenv.config({ path: 'config/config.env' });
