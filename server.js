@@ -25,7 +25,7 @@ const app = express();
 var whitelist = [
   'http://localhost:3000',
   'http://localhost:3001',
-  'https://lucid-leakey-fec418.netlify.app'
+  'https://oyama-karate-next-5r5wcgju3-jpisula.vercel.app'
 ]; //white list consumers
 var corsOptions = {
   origin: function (origin, callback) {
