@@ -12,7 +12,7 @@ const db = require('../utils/db');
 // @route     GET /api/v1/instructors
 // @access    Public
 exports.getInstructors = asyncHandler(async (req, res, next) => {
-  const sql = 'SELECT * FROM Instructor';
+  const sql = 'SELECT * FROM Instructor ORDER BY orderNum';
 
   db.query(sql, (err, result) => {
     if (err) {

@@ -10,6 +10,8 @@ const {
 } = require('../utils/imageFiles');
 const uuid = require('uuid');
 const db = require('../utils/db');
+const sharp = require('sharp');
+const { resolve } = require('path');
 
 // @desc      Get all articles
 // @route     GET /api/v1/articles
@@ -104,9 +106,8 @@ exports.createArticle = asyncHandler(async (req, res, next) => {
 
   if (req.files) {
     const bigImg = req.files.bigImg;
-    const smallImg = req.files.smallImg;
 
-    let files = [bigImg, smallImg];
+    let files = [bigImg];
     files = files.filter((file) => file !== undefined);
 
     checkIfFileIsImage(files);
@@ -116,18 +117,7 @@ exports.createArticle = asyncHandler(async (req, res, next) => {
       files
     );
 
-    if (smallImg && bigImg) {
-      req.body = {
-        ...req.body,
-        bigImgUrl: bigImg.name,
-        smallImgUrl: smallImg.name
-      };
-    } else if (smallImg) {
-      req.body = {
-        ...req.body,
-        smallImgUrl: smallImg.name
-      };
-    } else if (bigImg) {
+    if (bigImg) {
       req.body = {
         ...req.body,
         bigImgUrl: bigImg.name
@@ -173,34 +163,22 @@ exports.updateArticle = asyncHandler(async (req, res, next) => {
 
   if (req.files) {
     const bigImg = req.files.bigImg;
-    const smallImg = req.files.smallImg;
 
-    let files = [bigImg, smallImg];
+    let files = [bigImg];
     files = files.filter((file) => file !== undefined);
 
     const filePath = `${process.env.FILE_UPLOAD_PATH}/photos/articles/`;
     deleteFiles([
-      bigImg ? `${filePath}${article[0].bigImgUrl || 'photo'}` : 'photo',
-      smallImg ? `${filePath}${article[0].smallImgUrl || 'photo'}` : 'photo'
+      bigImg ? `${filePath}${article[0].bigImgUrl || 'photo'}` : 'photo'
     ]);
     checkIfFileIsImage(files);
     uploadFiles(filePath, req.params.id, files);
 
-    if (smallImg && bigImg) {
+    if (bigImg) {
       req.body = {
         ...req.body,
         bigImgUrl: bigImg.name,
         smallImgUrl: smallImg.name
-      };
-    } else if (smallImg) {
-      req.body = {
-        ...req.body,
-        smallImgUrl: smallImg.name
-      };
-    } else if (bigImg) {
-      req.body = {
-        ...req.body,
-        bigImgUrl: bigImg.name
       };
     }
   }

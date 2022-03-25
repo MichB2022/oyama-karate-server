@@ -28,7 +28,7 @@ exports.getScheduleById = asyncHandler(async (req, res, next) => {
 // @route     GET /api/v1/schedule
 // @access    Public
 exports.getAllSchedules = asyncHandler(async (req, res, next) => {
-  let sql = 'SELECT * FROM Schedule';
+  let sql = 'SELECT * FROM Schedule ORDER BY orderNum';
 
   const schedules = await new Promise((resolve, reject) => {
     db.query(sql, (err, result) => {
@@ -68,7 +68,7 @@ exports.getAllSchedules = asyncHandler(async (req, res, next) => {
 // @route     GET /api/v1/schedule/names
 // @access    Public
 exports.getAllSchedulesNames = asyncHandler(async (req, res, next) => {
-  let sql = 'SELECT * FROM Schedule';
+  let sql = 'SELECT * FROM Schedule ORDER BY orderNum';
 
   db.query(sql, (err, result) => {
     if (err) {

@@ -15,7 +15,7 @@ const { group } = require('console');
 // @route     GET /api/v1/sections
 // @access    Public
 exports.getSections = asyncHandler(async (req, res, next) => {
-  const sql = 'SELECT * FROM Sections';
+  const sql = 'SELECT * FROM Sections ORDER BY orderNum';
 
   db.query(sql, (err, result) => {
     if (err) {
@@ -34,7 +34,7 @@ exports.getSections = asyncHandler(async (req, res, next) => {
 // @route     GET /api/v1/sections/labels
 // @access    Public
 exports.getSectionsLabelsAndNames = asyncHandler(async (req, res, next) => {
-  const sql = 'SELECT id, label, name FROM Sections';
+  const sql = 'SELECT id, label, name FROM Sections ORDER BY orderNum';
 
   const resolve = (err, result) => {
     if (err) {

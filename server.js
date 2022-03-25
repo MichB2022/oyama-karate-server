@@ -89,6 +89,7 @@ const instructorR = require('./routes/instructorR.js');
 const imagesR = require('./routes/imagesR.js');
 const galeriesR = require('./routes/galeriesR.js');
 const motivationR = require('./routes/motivationR.js');
+const calendarpageR = require('./routes/calendarpageR.js');
 
 // Mount routers
 app.use('/api/v1/auth', auth);
@@ -107,6 +108,7 @@ app.use('/api/v1/instructors', instructorR);
 app.use('/api/v1/images', imagesR);
 app.use('/api/v1/galery', galeriesR);
 app.use('/api/v1/motivation', motivationR);
+app.use('/api/v1/calendarpage', calendarpageR);
 
 app.use(errorHandler);
 

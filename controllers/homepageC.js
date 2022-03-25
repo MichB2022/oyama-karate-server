@@ -27,6 +27,44 @@ exports.getHomepage = asyncHandler(async (req, res, next) => {
   });
 });
 
+// @desc      Get contact
+// @route     GET /api/v1/homepage/contact
+// @access    Public
+exports.getContact = asyncHandler(async (req, res, next) => {
+  const sql = 'SELECT phone, email FROM Homepage';
+
+  db.query(sql, (err, result) => {
+    if (err) {
+      return next(new ErrorResponse(err, 500));
+    }
+
+    res.status(201).json({
+      success: true,
+      count: result.length,
+      data: result[0]
+    });
+  });
+});
+
+// @desc      Get defaultPageDescription
+// @route     GET /api/v1/homepage/decription
+// @access    Public
+exports.getDescription = asyncHandler(async (req, res, next) => {
+  const sql = 'SELECT defaultPageDescription FROM Homepage';
+
+  db.query(sql, (err, result) => {
+    if (err) {
+      return next(new ErrorResponse(err, 500));
+    }
+
+    res.status(201).json({
+      success: true,
+      count: result.length,
+      data: result[0]
+    });
+  });
+});
+
 // @desc      Create new homepage
 // @route     POST /api/v1/homepage
 // @access    Private
@@ -149,5 +187,33 @@ exports.deleteHomepage = asyncHandler(async (req, res, next) => {
       success: true,
       data: {}
     });
+  });
+});
+
+// @desc      UpdateOrder
+// @route     POST /api/v1/homepage/updateorder
+// @access    Private
+exports.updateOrder = asyncHandler(async (req, res, next) => {
+  let sql = '';
+  let i = 1;
+  for (const id of req.body.ids) {
+    sql = `UPDATE ${req.body.table} SET ? WHERE id='${id}'`;
+    const data = {
+      orderNum: i
+    };
+    await new Promise((resolve, reject) => {
+      db.queryWithParams(sql, data, (err, result) => {
+        if (err) {
+          return next(new ErrorResponse(err, 500));
+        }
+        resolve();
+      });
+    });
+    i++;
+  }
+
+  res.status(201).json({
+    success: true,
+    data: {}
   });
 });
