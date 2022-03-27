@@ -7,8 +7,10 @@ const {
 
 const router = express.Router();
 
+const { protect } = require('../middleware/auth');
+
 router.route('/').get(getMotivation);
-router.route('/image').post(uploadMotivationImage);
-router.route('/image/:id').delete(deleteGaleryImage);
+router.route('/image').post(protect, uploadMotivationImage);
+router.route('/image/:id').delete(protect, deleteGaleryImage);
 
 module.exports = router;

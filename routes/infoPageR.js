@@ -9,14 +9,13 @@ const {
 
 const router = express.Router();
 
-const advancedResults = require('../middleware/advancedResults');
-// const { protect, authorize } = require('../middleware/auth');
+const { protect } = require('../middleware/auth');
 
-router.route('/').get(getInfoPagesLabels).post(createInfoPage);
+router.route('/').get(getInfoPagesLabels).post(protect, createInfoPage);
 router
   .route('/:id')
   .get(getInfoPage)
-  .post(updateInfoPage)
-  .delete(deleteInfoPage);
+  .post(protect, updateInfoPage)
+  .delete(protect, deleteInfoPage);
 
 module.exports = router;

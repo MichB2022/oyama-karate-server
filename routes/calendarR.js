@@ -10,15 +10,14 @@ const {
 
 const router = express.Router();
 
-const advancedResults = require('../middleware/advancedResults');
-// const { protect, authorize } = require('../middleware/auth');
+const { protect } = require('../middleware/auth');
 
-router.route('/').get(getCalendars).post(createCalendar);
+router.route('/').get(getCalendars).post(protect, createCalendar);
 router
   .route('/:id')
   .get(getCalendarById)
-  .post(updateCalendar)
-  .delete(deleteCalendar);
-router.route('/:id/photo').put(calendarPhotoUpload);
+  .post(protect, updateCalendar)
+  .delete(protect, deleteCalendar);
+router.route('/:id/photo').put(protect, calendarPhotoUpload);
 
 module.exports = router;

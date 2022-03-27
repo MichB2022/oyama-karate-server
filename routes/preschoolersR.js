@@ -9,11 +9,13 @@ const {
 
 const router = express.Router();
 
-const advancedResults = require('../middleware/advancedResults');
-// const { protect, authorize } = require('../middleware/auth');
+const { protect } = require('../middleware/auth');
 
-router.route('/').get(getPreschooler).post(createPreschooler);
-router.route('/:id').post(updatePreschooler).delete(deletePreschooler);
-router.route('/:id/photo').put(preschoolerPhotoUpload);
+router.route('/').get(getPreschooler).post(protect, createPreschooler);
+router
+  .route('/:id')
+  .post(protect, updatePreschooler)
+  .delete(protect, deletePreschooler);
+router.route('/:id/photo').put(protect, preschoolerPhotoUpload);
 
 module.exports = router;

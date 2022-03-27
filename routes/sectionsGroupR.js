@@ -12,17 +12,19 @@ const {
 
 const router = express.Router();
 
-const advancedResults = require('../middleware/advancedResults');
-// const { protect, authorize } = require('../middleware/auth');
+const { protect } = require('../middleware/auth');
 
 router.route('/').get(getSectionsGroup);
-router.route('/add').post(createSectionsGroup);
-router.route('/:id').post(updateSectionsGroup).delete(deleteSectionsGroup);
+router.route('/add').post(protect, createSectionsGroup);
+router
+  .route('/:id')
+  .post(protect, updateSectionsGroup)
+  .delete(protect, deleteSectionsGroup);
 router.route('/schedule').get(getSectionsGroupSchedule);
-router.route('/schedule/add').post(createSectionsGroupSchedule);
+router.route('/schedule/add').post(protect, createSectionsGroupSchedule);
 router
   .route('/schedule/:id')
-  .post(updateSectionsGroupSchedule)
-  .delete(deleteSectionsGroupSchedule);
+  .post(protect, updateSectionsGroupSchedule)
+  .delete(protect, deleteSectionsGroupSchedule);
 
 module.exports = router;

@@ -7,8 +7,10 @@ const {
 
 const router = express.Router();
 
-router.route('/').get(getCategories).post(createCategory);
+const { protect } = require('../middleware/auth');
 
-router.route('/:id').delete(deleteCategory);
+router.route('/').get(getCategories).post(protect, createCategory);
+
+router.route('/:id').delete(protect, deleteCategory);
 
 module.exports = router;

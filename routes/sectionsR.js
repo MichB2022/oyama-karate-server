@@ -11,15 +11,18 @@ const {
 
 const router = express.Router();
 
-const advancedResults = require('../middleware/advancedResults');
-// const { protect, authorize } = require('../middleware/auth');
+const { protect } = require('../middleware/auth');
 
-router.route('/:id/photo').put(sectionPhotoUpload);
+router.route('/:id/photo').put(protect, sectionPhotoUpload);
 
-router.route('/').get(getSections).post(createSection);
+router.route('/').get(getSections).post(protect, createSection);
 
 router.route('/labels').get(getSectionsLabelsAndNames);
 
-router.route('/:id').get(getSection).put(updateSection).delete(deleteSection);
+router
+  .route('/:id')
+  .get(getSection)
+  .put(protect, updateSection)
+  .delete(protect, deleteSection);
 
 module.exports = router;

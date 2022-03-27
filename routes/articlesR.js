@@ -10,13 +10,16 @@ const {
 
 const router = express.Router();
 
-const advancedResults = require('../middleware/advancedResults');
-// const { protect, authorize } = require('../middleware/auth');
+const { protect } = require('../middleware/auth');
 
-router.route('/:id/photo').put(articlePhotoUpload);
+router.route('/:id/photo').put(protect, articlePhotoUpload);
 
-router.route('/').get(getArticles).post(createArticle);
+router.route('/').get(getArticles).post(protect, createArticle);
 
-router.route('/:id').get(getArticle).put(updateArticle).delete(deleteArticle);
+router
+  .route('/:id')
+  .get(getArticle)
+  .put(protect, updateArticle)
+  .delete(protect, deleteArticle);
 
 module.exports = router;

@@ -11,10 +11,15 @@ const {
 
 const router = express.Router();
 
-router.route('/').get(getHomepage).post(createHomepage);
+const { protect } = require('../middleware/auth');
+
+router.route('/').get(getHomepage).post(protect, createHomepage);
 router.route('/contact').get(getContact);
-router.route('/updateorder').post(updateOrder);
+router.route('/updateorder').post(protect, updateOrder);
 router.route('/description').get(getDescription);
-router.route('/:id').post(updateHomepage).delete(deleteHomepage);
+router
+  .route('/:id')
+  .post(protect, updateHomepage)
+  .delete(protect, deleteHomepage);
 
 module.exports = router;
