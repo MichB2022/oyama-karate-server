@@ -159,7 +159,6 @@ exports.updateArticle = asyncHandler(async (req, res, next) => {
   if (req.body.title) {
     req.body.slug = slugify(req.body.title, { lower: true });
   }
-  // req.body.tags = req.body?.tags.map((tag) => tag.name).join(',');
 
   if (req.files) {
     const bigImg = req.files.bigImg;

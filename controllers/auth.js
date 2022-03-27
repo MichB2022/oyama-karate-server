@@ -75,7 +75,20 @@ exports.logout = asyncHandler(async (req, res, next) => {
 // @route     POST /api/v1/auth/updatepassword
 // @access    Private
 exports.updatePassword = asyncHandler(async (req, res, next) => {
-  let sql = `SELECT * FROM User WHERE id='${req.body.id}'`;
+  let token;
+
+  if (req.cookies.oyamaKarateEuToken) {
+    token = req.cookies.oyamaKarateEuToken;
+  }
+
+  // Make sure token exists
+  if (!token) {
+    return next(new ErrorResponse('Not authorized to access this route', 401));
+  }
+
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+  let sql = `SELECT * FROM User WHERE id='${decoded.id}'`;
   const user = await new Promise((resolve, reject) => {
     db.query(sql, (err, result) => {
       if (err) {
@@ -90,12 +103,16 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
 
   // Check current password
   if (!(await bcrypt.compare(req.body.currentPassword, user.password))) {
-    return next(new ErrorResponse('Password is incorrect', 401));
+    res.status(201).json({
+      success: false,
+      message: 'Password is incorrect'
+    });
+    return;
   }
   const salt = await bcrypt.genSalt(10);
   req.body = { password: await bcrypt.hash(req.body.password, salt) };
 
-  sql = `UPDATE User SET ? WHERE id='${req.params.id}'`;
+  sql = `UPDATE User SET ? WHERE id='${decoded.id}'`;
   db.queryWithParams(sql, req.body, (err, result) => {
     if (err) {
       return next(new ErrorResponse(err, 500));
