@@ -81,8 +81,6 @@ exports.updatePassword = asyncHandler(async (req, res, next) => {
     token = req.cookies.oyamaKarateEuToken;
   }
 
-  console.log('cookies', req.cookies);
-
   // Make sure token exists
   if (!token) {
     return next(new ErrorResponse('Not authorized to access this route', 401));
