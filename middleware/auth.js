@@ -11,7 +11,7 @@ exports.protect = asyncHandler(async (req, res, next) => {
     token = req.cookies.oyamaKarateEuToken;
   }
 
-  console.log('cookies', req.cookies);
+  console.log('cookies', req);
 
   // Make sure token exists
   if (!token) {
