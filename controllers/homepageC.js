@@ -7,6 +7,7 @@ const {
 } = require('../utils/imageFiles');
 const uuid = require('uuid');
 const db = require('../utils/db');
+const nodemailer = require('nodemailer');
 
 // @desc      Get all homepage
 // @route     GET /api/v1/homepage
@@ -215,5 +216,45 @@ exports.updateOrder = asyncHandler(async (req, res, next) => {
   res.status(201).json({
     success: true,
     data: {}
+  });
+});
+
+exports.sendEmail = asyncHandler(async (req, res, next) => {
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_SERVICE,
+    port: process.env.SMTP_PORT,
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS
+    }
+  });
+
+  const mailOptions = {
+    from: process.env.FROM_EMAIL,
+    to: process.env.TO_EMAIL,
+    subject: `Strona: Formularz od nowej osoby`,
+    text: `
+        <p>
+          Formularz od: ${req.body.name}
+        </p>
+        ${req.body.email && `<p>Email: ${req.body.email}</p>`}
+        ${req.body.phone && `<p>Telefon: ${req.body.phone}</p>`}
+        <p>Treść: ${req.body.content}</p>
+      `
+  };
+
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+      res.status(400).json({
+        success: false,
+        data: {}
+      });
+    } else {
+      res.status(201).json({
+        success: true,
+        data: {}
+      });
+    }
   });
 });

@@ -6,7 +6,8 @@ const {
   createHomepage,
   updateHomepage,
   updateOrder,
-  deleteHomepage
+  deleteHomepage,
+  sendEmail
 } = require('../controllers/homepageC');
 
 const router = express.Router();
@@ -17,6 +18,7 @@ router.route('/').get(getHomepage).post(protect, createHomepage);
 router.route('/contact').get(getContact);
 router.route('/updateorder').post(protect, updateOrder);
 router.route('/description').get(getDescription);
+router.route('/sendemail').post(sendEmail);
 router
   .route('/:id')
   .post(protect, updateHomepage)
