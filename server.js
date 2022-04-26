@@ -25,9 +25,10 @@ const app = express();
 var whitelist = [
   'http://localhost:3000',
   'http://localhost:3001',
-  'www.karatesilesia.pl',
-  'https://www.karatesilesia.pl',
-  'https://oyama-karate-admin.vercel.app'
+  'www.karatesilesia.pl/',
+  'https://www.karatesilesia.pl/',
+  'https://oyama-karate-admin.vercel.app/',
+  'https://oyama-karate-eu.vercel.app/'
 ]; //white list consumers
 var corsOptions = {
   origin: function (origin, callback) {
