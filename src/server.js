@@ -6,7 +6,7 @@ const cookieParser = require('cookie-parser');
 const fileupload = require('express-fileupload');
 const cors = require('cors');
 
-const errorHandler = require('./middleware/error');
+const errorHandler = require('../middleware/error');
 
 // Start functions - essential
 // const connectDB = require('./config/dbConfig');
@@ -79,23 +79,23 @@ app.use(fileupload());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Route files
-const auth = require('./routes/auth');
-const users = require('./routes/users');
-const homepageR = require('./routes/homepageR.js');
-const articlesR = require('./routes/articlesR.js');
-const categoriesR = require('./routes/categoriesR.js');
-const sectionsR = require('./routes/sectionsR.js');
-const sectionsGroupR = require('./routes/sectionsGroupR.js');
-const scheduleR = require('./routes/scheduleR.js');
-const preschoolersR = require('./routes/preschoolersR.js');
-const eventCategoryR = require('./routes/eventCategoryR.js');
-const calendarR = require('./routes/calendarR.js');
-const infoPageR = require('./routes/infoPageR.js');
-const instructorR = require('./routes/instructorR.js');
-const imagesR = require('./routes/imagesR.js');
-const galeriesR = require('./routes/galeriesR.js');
-const motivationR = require('./routes/motivationR.js');
-const calendarpageR = require('./routes/calendarpageR.js');
+const auth = require('../routes/auth');
+const users = require('../routes/users');
+const homepageR = require('../routes/homepageR.js');
+const articlesR = require('../routes/articlesR.js');
+const categoriesR = require('../routes/categoriesR.js');
+const sectionsR = require('../routes/sectionsR.js');
+const sectionsGroupR = require('../routes/sectionsGroupR.js');
+const scheduleR = require('../routes/scheduleR.js');
+const preschoolersR = require('../routes/preschoolersR.js');
+const eventCategoryR = require('../routes/eventCategoryR.js');
+const calendarR = require('../routes/calendarR.js');
+const infoPageR = require('../routes/infoPageR.js');
+const instructorR = require('../routes/instructorR.js');
+const imagesR = require('../routes/imagesR.js');
+const galeriesR = require('../routes/galeriesR.js');
+const motivationR = require('../routes/motivationR.js');
+const calendarpageR = require('../routes/calendarpageR.js');
 
 // Mount routers
 app.use('/api/v1/auth', auth);
