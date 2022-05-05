@@ -12,8 +12,6 @@ const errorHandler = require('./middleware/error');
 // const connectDB = require('./config/dbConfig');
 const app = express();
 
-const router = express.Router();
-
 // Security imports
 // Enable CORS
 // app.use(
@@ -58,27 +56,27 @@ var corsOptions = {
   ]
 };
 
-router.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 // Load env vars
 dotenv.config({ path: 'config/config.env' });
 
 // Body parser
-router.use(express.json());
+app.use(express.json());
 
 // Cookie parser
-router.use(cookieParser());
+app.use(cookieParser());
 
 // Dev logging middleware
 if (process.env.NODE_ENV === 'development') {
-  router.use(morgan('dev'));
+  app.use(morgan('dev'));
 }
 
 // File uploading
-router.use(fileupload());
+app.use(fileupload());
 
 // Set static folder
-router.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Route files
 const auth = require('./routes/auth');
@@ -100,29 +98,29 @@ const motivationR = require('./routes/motivationR.js');
 const calendarpageR = require('./routes/calendarpageR.js');
 
 // Mount routers
-router.use('/api/v1/auth', auth);
-router.use('/api/v1/users', users);
-router.use('/api/v1/homepage', homepageR);
-router.use('/api/v1/articles', articlesR);
-router.use('/api/v1/categories', categoriesR);
-router.use('/api/v1/sections', sectionsR);
-router.use('/api/v1/sectionsgroup', sectionsGroupR);
-router.use('/api/v1/schedule', scheduleR);
-router.use('/api/v1/preschooler', preschoolersR);
-router.use('/api/v1/eventcategories', eventCategoryR);
-router.use('/api/v1/infopages', infoPageR);
-router.use('/api/v1/calendar', calendarR);
-router.use('/api/v1/instructors', instructorR);
-router.use('/api/v1/images', imagesR);
-router.use('/api/v1/galery', galeriesR);
-router.use('/api/v1/motivation', motivationR);
-router.use('/api/v1/calendarpage', calendarpageR);
+app.use('/api/v1/auth', auth);
+app.use('/api/v1/users', users);
+app.use('/api/v1/homepage', homepageR);
+app.use('/api/v1/articles', articlesR);
+app.use('/api/v1/categories', categoriesR);
+app.use('/api/v1/sections', sectionsR);
+app.use('/api/v1/sectionsgroup', sectionsGroupR);
+app.use('/api/v1/schedule', scheduleR);
+app.use('/api/v1/preschooler', preschoolersR);
+app.use('/api/v1/eventcategories', eventCategoryR);
+app.use('/api/v1/infopages', infoPageR);
+app.use('/api/v1/calendar', calendarR);
+app.use('/api/v1/instructors', instructorR);
+app.use('/api/v1/images', imagesR);
+app.use('/api/v1/galery', galeriesR);
+app.use('/api/v1/motivation', motivationR);
+app.use('/api/v1/calendarpage', calendarpageR);
 
-router.use(errorHandler);
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 
-const server = router.listen(
+const server = app.listen(
   PORT,
   console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`)
 );
