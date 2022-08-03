@@ -4,8 +4,8 @@
   "description": "REST API for oyama-karate.eu",
   "main": "server.js",
   "scripts": {
-    "start": "./node_modules/.bin/netlify-lambda serve src",
-    "build": "./node_modules/.bin/netlify-lambda build src"
+    "start:prod": "NODE_ENV=production node server",
+    "start:dev": "nodemon server"
   },
   "author": "Jakub Pisula & Szymon Chwila",
   "license": "ISC",
